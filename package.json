@@ -1,0 +1,23 @@
+{
+  "name": "graphql-with-mercurius-examples",
+  "version": "0.0.1",
+  "description": "A list of mercurius examples",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Puppo/GraphQL-with-Mercurius-examples.git"
+  },
+  "keywords": [
+    "graphql",
+    "mercurius"
+  ],
+  "author": "Luca Del Puppo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Puppo/GraphQL-with-Mercurius-examples/issues"
+  },
+  "homepage": "https://github.com/Puppo/GraphQL-with-Mercurius-examples#readme",
+  "workspaces": [
+    "packages/01-simple-js-blog"
+  ]
+}
