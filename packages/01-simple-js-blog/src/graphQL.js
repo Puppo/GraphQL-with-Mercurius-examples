@@ -74,7 +74,7 @@ export const resolvers = {
       const category = app.db.categories.find(category => category.id === categoryId)
       if (!category) {
         throw new mercurius.ErrorWithProps(
-          'message',
+          `Category with id ${categoryId} not found`,
           {
             code: 'CATEGORY_NOT_FOUND',
             message: `Category with id ${categoryId} not found`

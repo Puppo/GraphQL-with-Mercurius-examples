@@ -1,0 +1,20 @@
+{
+  "name": "02-work-with-typescript",
+  "version": "1.0.0",
+  "scripts": {
+    "type:check": "tsc --noEmit",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "NODE_ENV=development FASTIFY_AUTOLOAD_TYPESCRIPT=1 tsx watch src/index.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fastify/autoload": "^5.8.0",
+    "fastify": "^4.25.2",
+    "fastify-plugin": "^4.5.1",
+    "graphql": "^16.8.1",
+    "mercurius": "^13.3.3",
+    "mercurius-codegen": "^5.0.3"
+  }
+}

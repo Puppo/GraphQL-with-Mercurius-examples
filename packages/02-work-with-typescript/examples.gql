@@ -1,0 +1,81 @@
+query GetCategories {
+  getCategories {
+    id,
+    name,
+    posts {
+      id,
+      title
+    }
+  }
+}
+
+query GetCategory {
+  getCategory(id: "5e867c4f-8d87-4e65-ac0b-68f23ebef2f4") {
+    id,
+    name,
+    posts {
+      id,
+      title,
+      content
+    }
+  }
+}
+
+query GetPosts {
+  getPosts(offset: 0, limit: 10) {
+    id,
+    title,
+    content,
+    category {
+      id,
+      name
+    }
+  }
+}
+
+query GetPost {
+  getPost(id: "a0a0a0a0-a0a0-a0a0-a0a0-a0a0a0a0a0a0") {
+    id,
+    title,
+    content,
+    category {
+      id,
+      name
+    }
+  }
+}
+
+query GetPostsByCategory {
+  getPostsByCategory(categoryId: "5e867c4f-8d87-4e65-ac0b-68f23ebef2f4") {
+    id,
+    title,
+    content,
+    category {
+      id,
+      name
+    }
+  }
+}
+
+mutation CreateCategory {
+  createCategory(name: "Test") {
+    id,
+    name
+  }
+}
+
+mutation CreatePost {
+  createPost(newPost: {
+    title: "Test Title",
+    content: "Test Content",
+    categoryId: "49e26205-4231-483c-a0e5-6a00dd8cf146"
+  }) {
+    id,
+    title,
+    content,
+    category {
+      id,
+      name
+    }
+  }
+}
