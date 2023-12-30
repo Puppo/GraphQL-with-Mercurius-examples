@@ -26,7 +26,8 @@
   "homepage": "https://github.com/Puppo/GraphQL-with-Mercurius-examples#readme",
   "workspaces": [
     "packages/01-simple-js-blog",
-    "packages/02-work-with-typescript"
+    "packages/02-work-with-typescript",
+    "packages/03-custom-directives-and-validation"
   ],
   "devDependencies": {
     "@tsconfig/recommended": "^1.0.3",
