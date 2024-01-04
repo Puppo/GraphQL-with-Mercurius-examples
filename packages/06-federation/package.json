@@ -1,0 +1,28 @@
+{
+  "name": "06-federation",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "type:check": "tsc --noEmit",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "NODE_ENV=development FASTIFY_AUTOLOAD_TYPESCRIPT=1 tsx watch src/index.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fastify/autoload": "^5.8.0",
+    "@fastify/jwt": "^7.2.4",
+    "@graphql-tools/schema": "^10.0.2",
+    "@graphql-tools/utils": "^10.0.12",
+    "@mercuriusjs/federation": "^2.0.0",
+    "@mercuriusjs/gateway": "^2.2.0",
+    "fastify": "^4.25.2",
+    "fastify-plugin": "^4.5.1",
+    "graphql": "^16.8.1",
+    "mercurius": "^13.3.3",
+    "mercurius-auth": "^5.0.0",
+    "mercurius-codegen": "^5.0.3",
+    "mercurius-validation": "^4.0.0"
+  }
+}

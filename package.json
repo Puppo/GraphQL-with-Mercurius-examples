@@ -28,7 +28,8 @@
     "packages/01-simple-js-blog",
     "packages/02-work-with-typescript",
     "packages/03-custom-directives-and-validation",
-    "packages/04-auth"
+    "packages/04-auth",
+    "packages/06-federation"
   ],
   "devDependencies": {
     "@tsconfig/recommended": "^1.0.3",
