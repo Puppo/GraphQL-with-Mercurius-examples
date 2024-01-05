@@ -29,6 +29,7 @@
     "packages/02-work-with-typescript",
     "packages/03-custom-directives-and-validation",
     "packages/04-auth",
+    "packages/05-n+1",
     "packages/06-federation"
   ],
   "devDependencies": {
