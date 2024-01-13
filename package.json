@@ -27,9 +27,9 @@
   "workspaces": [
     "packages/01-simple-js-blog",
     "packages/02-work-with-typescript",
-    "packages/03-custom-directives-and-validation",
-    "packages/04-auth",
-    "packages/05-n+1",
+    "packages/04-custom-directives-and-validation",
+    "packages/05-auth",
+    "packages/03-n+1",
     "packages/06-federation"
   ],
   "devDependencies": {

@@ -1,8 +1,7 @@
 {
-  "name": "03-custom-directives-and-validation",
+  "name": "05-auth",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
     "type:check": "tsc --noEmit",
     "build": "tsc",
@@ -19,6 +18,7 @@
     "fastify-plugin": "^4.5.1",
     "graphql": "^16.8.1",
     "mercurius": "^13.3.3",
+    "mercurius-auth": "^5.0.0",
     "mercurius-codegen": "^5.0.3",
     "mercurius-validation": "^4.0.0"
   }
