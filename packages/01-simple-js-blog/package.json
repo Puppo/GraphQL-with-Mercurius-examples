@@ -16,6 +16,11 @@
     "fastify": "^4.25.2",
     "fastify-plugin": "^4.5.1",
     "mercurius": "^13.3.3",
-    "pino-pretty": "^10.3.1"
+    "pino-pretty": "^10.3.1",
+    "promised-sqlite3": "^2.1.0",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "@types/sqlite3": "^3.1.11"
   }
 }

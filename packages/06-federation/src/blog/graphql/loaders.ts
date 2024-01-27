@@ -1,50 +1,58 @@
 import { MercuriusLoaders } from 'mercurius'
-import { mapCategory } from './mappers'
+import { Category, Post } from '../plugins/db'
+
+function createMapById<T extends { id: string }>(items: T[]): Map<string, T> {
+  return new Map<string, T>(items.map(item => [item.id, item]))
+}
 
 const loaders: MercuriusLoaders = {
   Category: {
-    createdBy: async (queries, { app: { dbBlog, log } }) => {
+    createdBy: async (queries, { app: { db, log } }) => {
       log.info(queries, 'Category.createdBy')
-      const categoriesById = new Map(dbBlog.categories.map(category => [category.id, category]))
-      return queries.map(({ obj: { id } }) => {
-        const dbCategory = categoriesById.get(id)!
-        return {
-          __typename: 'User',
-          id: dbCategory.createdBy
-        }
-      })
+      const categoriesById = createMapById(
+        await db.all<Category>(
+          `SELECT * FROM category WHERE id IN (${queries.map(({ obj }) => `'${obj.id}'`).join(',')})`
+        )
+      )
+      return queries.map(({ obj: { id } }) => ({
+        __typename: 'User',
+        id: categoriesById.get(id)!.createdBy
+      }))
     },
-    posts: async (queries, { app: { dbBlog: db, log } }) => {
+    posts: async (queries, { app: { db, log } }) => {
       log.info(queries, 'Category.posts')
-      const postsByCategoryId = db.posts.reduce((acc, post) => {
-        const { categoryId } = post
-        const posts = acc.get(categoryId) || []
-        posts.push(post)
-        acc.set(categoryId, posts)
-        return acc
-      }, new Map())
-      return queries.map(({ obj: { id } }) => postsByCategoryId.get(id) || [])
+      const postsByCategory = await db.all<Omit<Post, 'createdBy'> & { category_id: Category['id'] }>(`
+SELECT post.categoryId as category_id, post.id, post.title, post.content
+FROM post
+INNER JOIN category ON category.id = post.categoryId
+WHERE category.id IN (${queries.map(({ obj: { id } }) => `'${id}'`).join(',')})
+ORDER BY category.id
+`)
+      return queries.map(({ obj: { id } }) => postsByCategory.filter(({ category_id }) => category_id === id))
     }
   },
   Post: {
-    createdBy: async (queries, { app: { dbBlog, log } }) => {
+    createdBy: async (queries, { app: { db, log } }) => {
       log.info(queries, 'Post.createdBy')
-      const postsById = new Map(dbBlog.posts.map(post => [post.id, post]))
-      return queries.map(({ obj: { id } }) => {
-        const dbPost = postsById.get(id)!
-        return {
-          __typename: 'User',
-          id: dbPost.createdBy
-        }
-      })
+      const postsById = createMapById(
+        await db.all<Post>(
+          `SELECT id, createdBy FROM post WHERE id IN (${queries.map(({ obj }) => `'${obj.id}'`).join(',')})`
+        )
+      )
+      return queries.map(({ obj: { id } }) => ({
+        __typename: 'User',
+        id: postsById.get(id)!.createdBy
+      }))
     },
-    category: async (queries, { app: { dbBlog: db, log } }) => {
+    category: async (queries, { app: { db, log } }) => {
       log.info(queries, 'Post.category')
-      const categoriesById = new Map(db.categories.map(category => [category.id, category]))
-      return queries.map(({ obj: { id } }) => {
-        const { categoryId } = db.posts.find(p => p.id === id)!
-        return mapCategory(categoriesById.get(categoryId)!)
-      })
+      const categoriesByPostId = await db.all<Omit<Category, 'createdBy'> & { post_id: Post['id'] }>(`
+SELECT post.id as post_id, category.id, category.name
+FROM category
+INNER JOIN post ON post.categoryId = category.id
+WHERE post.id IN (${queries.map(({ obj: { id } }) => `'${id}'`).join(',')})
+`)
+      return queries.map(({ obj: { id } }) => categoriesByPostId.find(({ post_id }) => post_id === id)!)
     }
   }
 }

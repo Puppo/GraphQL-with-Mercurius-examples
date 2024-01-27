@@ -1,4 +1,5 @@
 import fp from 'fastify-plugin'
+import { ErrorWithProps } from 'mercurius'
 import mercuriusAuth from 'mercurius-auth'
 import { Policy } from './utils'
 
@@ -33,7 +34,19 @@ export default fp(async function Auth(app) {
       return context.reply.request.user as AuthContext
     },
     async applyPolicy(policy, parent, args, context) {
-      return policy.requires.includes(context.auth?.role)
+      const isAuth = policy.requires.includes(context.auth?.role)
+      if (!isAuth) {
+        throw new ErrorWithProps(
+          `Failed auth policy`,
+          {
+            code: 'AUTH_FAILED',
+            message: `Failed auth policy`
+          },
+          401
+        )
+      }
+
+      return isAuth
     },
     mode: 'external',
     policy: {

@@ -1,42 +1,43 @@
 import { randomUUID } from 'crypto'
 import { ErrorWithProps, IResolvers } from 'mercurius'
+import { Category } from './generated'
 import type { Mutation, Query } from './utils'
 
 const Query = {
   getCategories: (_, __, { app }) => {
-    return app.db.categories
+    return app.db.all('SELECT * FROM category')
   },
   getCategory: (_parent, args, { app }) => {
     const { id } = args
-    return app.db.categories.find(category => category.id === id)
+    return app.db.get('SELECT * FROM category WHERE id=?', [id])
   },
   getPosts: (_parent, args, { app }) => {
     const { offset, limit } = args
-    return app.db.posts.slice(offset, offset + limit)
+    return app.db.all('SELECT * FROM post LIMIT ?,?', [offset, limit])
   },
   getPost: (_parent, args, { app }) => {
     const { id } = args
-    return app.db.posts.find(post => post.id === id)
+    return app.db.get('SELECT * FROM post WHERE id=?', [id])
   },
   getPostsByCategory: (_parent, args, { app }) => {
     const { categoryId } = args
-    return app.db.posts.filter(post => post.categoryId === categoryId)
+    return app.db.all('SELECT * FROM post WHERE categoryId=?', [categoryId])
   }
 } satisfies Query
 
 const Mutation = {
-  createCategory: (_parent, args, { app }) => {
+  createCategory: async (_parent, args, { app }) => {
     const { name } = args
     const category = {
       id: randomUUID(),
       name
     }
-    app.db.categories.push(category)
+    await app.db.run('INSERT INTO category (id, name) VALUES (?,?)', [category.id, category.name])
     return category
   },
-  createPost: (_parent, { newPost }, { app }) => {
+  createPost: async (_parent, { newPost }, { app }) => {
     const { title, content, categoryId } = newPost
-    const category = app.db.categories.find(category => category.id === categoryId)
+    const category = await app.db.get<Category>('SELECT * FROM category WHERE id=?', [categoryId])
     if (!category) {
       throw new ErrorWithProps(
         `Category with id ${categoryId} not found`,
@@ -44,7 +45,7 @@ const Mutation = {
           code: 'CATEGORY_NOT_FOUND',
           message: `Category with id ${categoryId} not found`
         },
-        200
+        404
       )
     }
 
@@ -54,7 +55,12 @@ const Mutation = {
       content,
       categoryId: category.id
     }
-    app.db.posts.push(post)
+    await app.db.run('INSERT INTO post (id, title, content, categoryId) VALUES (?,?,?,?)', [
+      post.id,
+      post.title,
+      post.content,
+      post.categoryId
+    ])
     return post
   }
 } satisfies Mutation
@@ -63,18 +69,17 @@ const resolvers: IResolvers = {
   Query,
   Mutation,
   Category: {
-    posts: (category, _, { app: { db, log } }) => {
-      log.info({ category }, 'Resolvers Category.posts')
-      return Promise.resolve(db.posts.filter(post => post.categoryId === category.id))
-    }
+    posts: (category, _, { app: { db } }) => db.all('SELECT * FROM post WHERE categoryId=?', [category.id])
   },
   Post: {
-    category: (post, _, { app: { db, log } }) => {
-      log.info({ post }, 'Resolvers Post.category')
-      const dbPost = db.posts.find(p => p.id === post.id)
-      const { categoryId } = dbPost!
-      return Promise.resolve(db.categories.find(category => category.id === categoryId)!)
-    }
+    category: (post, _, { app: { db } }) =>
+      db.get(
+        `
+    SELECT * FROM category
+    INNER JOIN post ON post.categoryId = category.id
+    WHERE post.id = ?`,
+        [post.id]
+      )
   }
 }
 

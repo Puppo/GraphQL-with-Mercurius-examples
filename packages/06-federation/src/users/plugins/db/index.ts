@@ -1,8 +1,12 @@
 import fp from 'fastify-plugin'
+import { AsyncDatabase } from 'promised-sqlite3'
+import sql from 'sqlite3'
+
+const sqlite = sql.verbose()
 
 type Permission = 'admin' | 'user'
 
-type User = {
+export type User = {
   id: string
   name: string
   role: Permission
@@ -10,13 +14,9 @@ type User = {
 
 type Users = Record<string, User>
 
-type Db = {
-  users: Users
-}
-
 declare module 'fastify' {
   interface FastifyInstance {
-    dbUsers: Db
+    db: AsyncDatabase
   }
 }
 
@@ -38,15 +38,32 @@ const users: Users = {
   }
 }
 
-const dbUsers: Db = {
-  users
-}
-
-const DbPlugin = fp(function DbPlugin(fastify, opts, next) {
+const DbPlugin = fp(async function DbPlugin(fastify) {
   fastify.log.info('Database loading...')
-  fastify.decorate('dbUsers', dbUsers)
-  fastify.log.info('Database loaded!')
-  next()
+  const db = new AsyncDatabase(new sqlite.Database(':memory:'))
+  fastify.decorate('db', db)
+
+  await new Promise<void>(resolve =>
+    db.inner.serialize(async () => {
+      await db.run(`
+CREATE TABLE users (
+    id TEXT PRIMARY KEY,
+    name TEXT,
+    role TEXT
+)`)
+      const userStatement = await db.prepare('INSERT INTO users (id, name, role) VALUES (?,?,?)')
+      for (const user of Object.values(users)) {
+        await userStatement.run([user.id, user.name, user.role])
+      }
+      await userStatement.finalize()
+
+      fastify.log.info('Database loaded!')
+
+      resolve()
+    })
+  )
+
+  fastify.addHook('onClose', async () => db.close())
 })
 
 export default DbPlugin

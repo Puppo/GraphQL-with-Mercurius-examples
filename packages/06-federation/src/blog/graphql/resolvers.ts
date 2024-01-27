@@ -1,50 +1,45 @@
 import { randomUUID } from 'crypto'
 import { ErrorWithProps, IResolvers } from 'mercurius'
-import { mapCategory, mapPost } from './mappers'
+import { Category, Post } from './generated'
 import type { Mutation, Query } from './utils'
 
 const Query = {
-  getCategories: async (_, __, { app }) => {
-    return app.dbBlog.categories.map(mapCategory)
+  getCategories: (_, __, { app }) => {
+    return app.db.all<Category>('SELECT id, name FROM category')
   },
-  getCategory: async (_parent, args, { app }) => {
+  getCategory: (_parent, args, { app }) => {
     const { id } = args
-    const category = app.dbBlog.categories.find(category => category.id === id)
-    if (!category) return null
-    return mapCategory(category)
+    return app.db.get<Category>('SELECT id, name FROM category WHERE id=?', [id])
   },
-  getPosts: async (_parent, args, { app }) => {
+  getPosts: (_parent, args, { app }) => {
     const { offset, limit } = args
-    return app.dbBlog.posts.slice(offset, offset + limit).map(mapPost)
+    return app.db.all<Post>('SELECT id, title, content FROM post LIMIT ?,?', [offset, limit])
   },
-  getPost: async (_parent, args, { app }) => {
+  getPost: (_parent, args, { app }) => {
     const { id } = args
-    const post = app.dbBlog.posts.find(post => post.id === id)
-    if (!post) return null
-    return mapPost(post)
+    return app.db.get<Post>('SELECT id, title, content FROM post WHERE id=?', [id])
   },
-  getPostsByCategory: async (_parent, args, { app }) => {
+  getPostsByCategory: (_parent, args, { app }) => {
     const { categoryId } = args
-    return app.dbBlog.posts.filter(post => post.categoryId === categoryId).map(mapPost)
+    return app.db.all<Post>('SELECT id, title, content FROM post WHERE categoryId=?', [categoryId])
   }
 } satisfies Query
 
 const Mutation = {
-  createCategory: async (_parent, args, { app: { dbBlog }, auth }) => {
+  createCategory: async (_parent, args, { app, auth }) => {
     const { id } = auth!
     const { name } = args
     const category = {
       id: randomUUID(),
-      name,
-      createdBy: id
+      name
     }
-    dbBlog.categories.push(category)
-    return mapCategory(category)
+    await app.db.run('INSERT INTO category (id, name, createdBy) VALUES (?,?,?)', [category.id, category.name, id])
+    return category
   },
-  createPost: async (_parent, { newPost }, { app: { dbBlog }, auth }) => {
+  createPost: async (_parent, { newPost }, { app, auth }) => {
     const { id } = auth!
     const { title, content, categoryId } = newPost
-    const category = dbBlog.categories.find(category => category.id === categoryId)
+    const category = await app.db.get<Category>('SELECT * FROM category WHERE id=?', [categoryId])
     if (!category) {
       throw new ErrorWithProps(
         `Category with id ${categoryId} not found`,
@@ -52,25 +47,29 @@ const Mutation = {
           code: 'CATEGORY_NOT_FOUND',
           message: `Category with id ${categoryId} not found`
         },
-        200
+        404
       )
     }
 
     const post = {
       id: randomUUID(),
       title,
-      content,
-      categoryId: category.id,
-      createdBy: id
+      content
     }
-    dbBlog.posts.push(post)
-    return mapPost(post)
+    await app.db.run('INSERT INTO post (id, title, content, categoryId, createdBy) VALUES (?,?,?,?,?)', [
+      post.id,
+      post.title,
+      post.content,
+      category.id,
+      id
+    ])
+    return post
   }
 } satisfies Mutation
 
-const resolvers = {
+const resolvers: IResolvers = {
   Query,
   Mutation
-} satisfies IResolvers
+}
 
 export default resolvers

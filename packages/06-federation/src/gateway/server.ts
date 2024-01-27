@@ -13,10 +13,10 @@ export default fp(async fastify => {
         },
         {
           name: 'user',
-          url: 'http://localhost:3002/graphql'
+          url: 'http://localhost:3002/graphql',
+          mandatory: true
         }
       ]
-    },
-    jit: 1
+    }
   })
 })

@@ -1,9 +1,8 @@
 {
-  "name": "05-n-1",
+  "name": "03-n-1",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "devDependencies": {},
   "scripts": {
     "type:check": "tsc --noEmit",
     "build": "tsc",
@@ -18,6 +17,8 @@
     "fastify-plugin": "^4.5.1",
     "graphql": "^16.8.1",
     "mercurius": "^13.3.3",
-    "mercurius-codegen": "^5.0.3"
+    "mercurius-codegen": "^5.0.3",
+    "promised-sqlite3": "^2.1.0",
+    "sqlite3": "^5.1.7"
   }
 }

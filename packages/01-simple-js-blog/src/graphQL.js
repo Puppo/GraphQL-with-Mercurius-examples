@@ -40,38 +40,38 @@ export const schema = `
 export const resolvers = {
   Query: {
     getCategories: (_, __, { app }) => {
-      return app.db.categories
+      return app.db.all('SELECT * FROM category')
     },
     getCategory: (_parent, args, { app }) => {
       const { id } = args
-      return app.db.categories.find(category => category.id === id)
+      return app.db.get('SELECT * FROM category WHERE id=?', [id])
     },
     getPosts: (_parent, args, { app }) => {
       const { offset, limit } = args
-      return app.db.posts.slice(offset, offset + limit)
+      return app.db.all('SELECT * FROM post LIMIT ?,?', [offset, limit])
     },
     getPost: (_parent, args, { app }) => {
       const { id } = args
-      return app.db.posts.find(post => post.id === id)
+      return app.db.get('SELECT * FROM post WHERE id=?', [id])
     },
     getPostsByCategory: (_parent, args, { app }) => {
       const { categoryId } = args
-      return app.db.posts.filter(post => post.categoryId === categoryId)
+      return app.db.all('SELECT * FROM post WHERE categoryId=?', [categoryId])
     }
   },
   Mutation: {
-    createCategory: (_parent, args, { app }) => {
+    createCategory: async (_parent, args, { app }) => {
       const { name } = args
       const category = {
         id: randomUUID(),
         name
       }
-      app.db.categories.push(category)
+      await app.db.run('INSERT INTO category (id, name) VALUES (?,?)', [category.id, category.name])
       return category
     },
-    createPost: (_parent, { newPost }, { app }) => {
+    createPost: async (_parent, { newPost }, { app }) => {
       const { title, content, categoryId } = newPost
-      const category = app.db.categories.find(category => category.id === categoryId)
+      const category = await app.db.get('SELECT * FROM category WHERE id=?', [categoryId])
       if (!category) {
         throw new mercurius.ErrorWithProps(
           `Category with id ${categoryId} not found`,
@@ -89,7 +89,12 @@ export const resolvers = {
         content,
         categoryId: category.id
       }
-      app.db.posts.push(post)
+      await app.db.run('INSERT INTO post (id, title, content, categoryId) VALUES (?,?,?,?)', [
+        post.id,
+        post.title,
+        post.content,
+        post.categoryId
+      ])
       return post
     }
   }
@@ -97,26 +102,26 @@ export const resolvers = {
 
 export const loaders = {
   Category: {
-    posts: (queries, { app: { db } }) => {
-      const postsByCategoryId = db.posts.reduce((acc, post) => {
-        const { categoryId } = post
-        const posts = acc.get(categoryId) || []
-        posts.push(post)
-        acc.set(categoryId, posts)
-        return acc
-      }, new Map())
-      return Promise.resolve(queries.map(({ obj: { id } }) => postsByCategoryId.get(id) || []))
+    posts: async (queries, { app: { db } }) => {
+      const postsByCategory = await db.all(`
+SELECT post.categoryId as category_id, post.id, post.title, post.content
+FROM post
+INNER JOIN category ON category.id = post.categoryId
+WHERE category.id IN (${queries.map(({ obj: { id } }) => `'${id}'`).join(',')})
+ORDER BY category.id
+`)
+      return queries.map(({ obj: { id } }) => postsByCategory.filter(({ category_id }) => category_id === id))
     }
   },
   Post: {
-    category: (queries, { app: { db } }) => {
-      const categoriesById = new Map(db.categories.map(category => [category.id, category]))
-      return Promise.resolve(
-        queries.map(({ obj: { id } }) => {
-          const categoryId = db.posts.find(p => p.id === id).categoryId
-          return categoriesById.get(categoryId)
-        })
-      )
+    category: async (queries, { app: { db } }) => {
+      const categoriesByPostId = await db.all(`
+SELECT post.id as post_id, category.id, category.name
+FROM category
+INNER JOIN post ON post.categoryId = category.id
+WHERE post.id IN (${queries.map(({ obj: { id } }) => `'${id}'`).join(',')})
+`)
+      return queries.map(({ obj: { id } }) => categoriesByPostId.find(({ post_id }) => post_id === id))
     }
   }
 }

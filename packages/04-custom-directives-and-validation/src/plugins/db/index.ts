@@ -1,4 +1,8 @@
 import fp from 'fastify-plugin'
+import { AsyncDatabase } from 'promised-sqlite3'
+import sql from 'sqlite3'
+
+const sqlite = sql.verbose()
 
 type Category = {
   id: string
@@ -12,14 +16,9 @@ type Post = {
   categoryId: string
 }
 
-type Db = {
-  categories: Category[]
-  posts: Post[]
-}
-
 declare module 'fastify' {
   interface FastifyInstance {
-    db: Db
+    db: AsyncDatabase
   }
 }
 
@@ -71,16 +70,46 @@ export const posts: Post[] = [
   }
 ]
 
-const db: Db = {
-  categories,
-  posts
-}
-
-const DbPlugin = fp(function DbPlugin(fastify, opts, next) {
+const DbPlugin = fp(async function DbPlugin(fastify) {
   fastify.log.info('Database loading...')
+  const db = new AsyncDatabase(new sqlite.Database(':memory:'))
   fastify.decorate('db', db)
-  fastify.log.info('Database loaded!')
-  next()
+
+  await new Promise<void>(resolve =>
+    db.inner.serialize(async () => {
+      await db.run(`
+CREATE TABLE category (
+    id TEXT PRIMARY KEY,
+    name TEXT
+)`)
+      await db.run(`
+CREATE TABLE post (
+  id TEXT PRIMARY KEY,
+  title TEXT,
+  content TEXT,
+  categoryId TEXT NOT NULL,
+  FOREIGN KEY (categoryId) REFERENCES category(id)
+)`)
+
+      const categoryStatement = await db.prepare('INSERT INTO category (id, name) VALUES (?,?)')
+      for (const category of categories) {
+        await categoryStatement.run([category.id, category.name])
+      }
+      await categoryStatement.finalize()
+
+      const postStatement = await db.prepare('INSERT INTO post (id, title, content, categoryId) VALUES (?,?,?,?)')
+      for (const post of posts) {
+        await postStatement.run([post.id, post.title, post.content, post.categoryId])
+      }
+      await postStatement.finalize()
+
+      fastify.log.info('Database loaded!')
+
+      resolve()
+    })
+  )
+
+  fastify.addHook('onClose', async () => db.close())
 })
 
 export default DbPlugin

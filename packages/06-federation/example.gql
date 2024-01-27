@@ -1,0 +1,138 @@
+query SignIn {
+  signIn (name: "John", password: "password") {
+    user {
+      id
+      name
+    }
+    token
+  }
+}
+
+query GetUserById {
+  getUserById(id: "3") {
+    id
+    name
+  }
+}
+
+query GetCategories {
+  getCategories {
+    id
+    name
+    posts {
+      id
+      title
+      createdBy {
+        name
+      }
+    }
+    createdBy {
+      name
+    }
+  }
+}
+
+query GetCategory {
+  getCategory(id: "5e867c4f-8d87-4e65-ac0b-68f23ebef2f4") {
+    id
+    name
+    posts {
+      id
+      title
+      content
+      createdBy {
+        name
+      }
+    }
+    createdBy {
+      name
+    }
+  }
+}
+
+query GetPosts {
+  getPosts(offset: 0, limit: 10) {
+    id
+    title
+    content
+    category {
+      id
+      name
+      createdBy {
+        name
+      }
+    }
+    createdBy {
+      name
+    }
+  }
+}
+
+query GetPost {
+  getPost(id: "a0a0a0a0-a0a0-a0a0-a0a0-a0a0a0a0a0a0") {
+    id
+    title
+    content
+    category {
+      id
+      name
+      createdBy {
+        name
+      }
+    }
+    createdBy {
+      name
+    }
+  }
+}
+
+query GetPostsByCategory {
+  getPostsByCategory(categoryId: "5e867c4f-8d87-4e65-ac0b-68f23ebef2f4") {
+    id
+    title
+    content
+    category {
+      id
+      name
+      createdBy {
+        name
+      }
+    }
+    createdBy {
+      name
+    }
+  }
+}
+
+mutation CreateCategory {
+  createCategory(name: "Test") {
+    id
+    name
+    createdBy {
+      name
+    }
+  }
+}
+
+mutation CreatePost {
+  createPost(
+    newPost: {
+      title: "Test Title",
+      content: "Test Content",
+      categoryId: "86fbf10d-f35f-490e-9439-8745bce7b014"
+    }) {
+    id
+    title
+    content
+    category {
+      id
+      name
+      createdBy {
+        name
+      }
+    }
+    createdBy {
+      name
+    }
+  }
+}

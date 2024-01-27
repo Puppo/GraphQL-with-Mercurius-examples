@@ -1,4 +1,5 @@
 import { ErrorWithProps } from 'mercurius'
+import { User } from '../plugins/db'
 import type { IResolvers } from './utils'
 
 const resolvers = {
@@ -7,13 +8,27 @@ const resolvers = {
       const { name, password } = args
       if (password !== 'password') {
         context.reply.code(401)
-        throw new ErrorWithProps('Invalid username or password')
+        throw new ErrorWithProps(
+          'Invalid username or password',
+          {
+            code: 'INVALID_USERNAME_OR_PASSWORD',
+            message: 'Invalid username or password'
+          },
+          401
+        )
       }
-      const user = Object.values(context.app.dbUsers.users).find(user => user.name === name)
+      const user = await context.app.db.get<User>('SELECT * FROM users WHERE name = ?', [name])
 
       if (!user) {
         context.reply.code(401)
-        throw new ErrorWithProps('Invalid username or password')
+        throw new ErrorWithProps(
+          'Invalid username or password',
+          {
+            code: 'INVALID_USERNAME_OR_PASSWORD',
+            message: 'Invalid username or password'
+          },
+          401
+        )
       }
 
       const token = context.app.jwt.sign({
@@ -29,11 +44,14 @@ const resolvers = {
     },
     getUserById: async (_root, args, context) => {
       const { id } = args
-      return context.app.dbUsers.users[id]
+      return context.app.db.get<User>('SELECT * FROM users WHERE id = ?', [id])
     },
     getUsersByIds: async (_root, args, context) => {
       const { ids } = args
-      return ids.map(id => context.app.dbUsers.users[id])
+      const users = await context.app.db.all<User>(
+        `SELECT * FROM users WHERE id IN (${ids.map(id => `'${id}'`).join(',')})`
+      )
+      return ids.map(id => users.find(user => user.id === id)!)
     }
   }
 } satisfies IResolvers

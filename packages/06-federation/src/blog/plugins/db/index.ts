@@ -1,12 +1,16 @@
 import fp from 'fastify-plugin'
+import { AsyncDatabase } from 'promised-sqlite3'
+import sql from 'sqlite3'
 
-export type DbCategory = {
+const sqlite = sql.verbose()
+
+export type Category = {
   id: string
   name: string
   createdBy: string
 }
 
-export type DbPost = {
+export type Post = {
   id: string
   title: string
   content: string
@@ -14,18 +18,13 @@ export type DbPost = {
   createdBy: string
 }
 
-type Db = {
-  categories: DbCategory[]
-  posts: DbPost[]
-}
-
 declare module 'fastify' {
   interface FastifyInstance {
-    dbBlog: Db
+    db: AsyncDatabase
   }
 }
 
-const categories: DbCategory[] = [
+const categories: Category[] = [
   {
     id: '5e867c4f-8d87-4e65-ac0b-68f23ebef2f4',
     name: 'Programming',
@@ -43,7 +42,7 @@ const categories: DbCategory[] = [
   }
 ]
 
-export const posts: DbPost[] = [
+export const posts: Post[] = [
   {
     id: 'a0a0a0a0-a0a0-a0a0-a0a0-a0a0a0a0a0a0',
     title: 'Why I love GraphQL',
@@ -81,16 +80,49 @@ export const posts: DbPost[] = [
   }
 ]
 
-const dbBlog: Db = {
-  categories,
-  posts
-}
-
-const DbPlugin = fp(function DbPlugin(fastify, opts, next) {
+const DbPlugin = fp(async function DbPlugin(fastify) {
   fastify.log.info('Database loading...')
-  fastify.decorate('dbBlog', dbBlog)
-  fastify.log.info('Database loaded!')
-  next()
+  const db = new AsyncDatabase(new sqlite.Database(':memory:'))
+  fastify.decorate('db', db)
+
+  await new Promise<void>(resolve =>
+    db.inner.serialize(async () => {
+      await db.run(`
+CREATE TABLE category (
+    id TEXT PRIMARY KEY,
+    name TEXT,
+    createdBy TEXT NOT NULL
+)`)
+      await db.run(`
+CREATE TABLE post (
+  id TEXT PRIMARY KEY,
+  title TEXT,
+  content TEXT,
+  categoryId TEXT NOT NULL,
+  createdBy TEXT NOT NULL,
+  FOREIGN KEY (categoryId) REFERENCES category(id)
+)`)
+      const categoryStatement = await db.prepare('INSERT INTO category (id, name, createdBy) VALUES (?,?,?)')
+      for (const category of categories) {
+        await categoryStatement.run([category.id, category.name, category.createdBy])
+      }
+      await categoryStatement.finalize()
+
+      const postStatement = await db.prepare(
+        'INSERT INTO post (id, title, content, categoryId, createdBy) VALUES (?,?,?,?,?)'
+      )
+      for (const post of posts) {
+        await postStatement.run([post.id, post.title, post.content, post.categoryId, post.createdBy])
+      }
+      await postStatement.finalize()
+
+      fastify.log.info('Database loaded!')
+
+      resolve()
+    })
+  )
+
+  fastify.addHook('onClose', async () => db.close())
 })
 
 export default DbPlugin

@@ -1,5 +1,7 @@
 import fp from 'fastify-plugin'
+import { ErrorWithProps } from 'mercurius'
 import mercuriusAuth from 'mercurius-auth'
+import { User } from '../plugins/db'
 import { Policy } from './utils'
 
 type Permission = 'admin' | 'user'
@@ -24,19 +26,31 @@ type GraphQLPolicy = Policy<PolicyItem>
 
 export default fp(async function Auth(app) {
   app.register(mercuriusAuth, {
-    authContext(context): AuthContext | Record<string, never> {
+    authContext: async (context): Promise<AuthContext | Record<string, never>> => {
       context.app.log.info('authContext')
       const userIdHeader = context.reply.request.headers['x-userid'] ?? ''
       const userIdString = typeof userIdHeader === 'string' ? userIdHeader.trim() : userIdHeader[0].trim()
       if (!userIdString) return {}
 
-      const userId = parseInt(userIdString, 10) + 10
-      const user = context.app.db.users[userId]
+      const userId = parseInt(userIdString, 10)
+      const user = await context.app.db.get<User>(`SELECT * FROM users WHERE id = ?`, [userId])
       if (!user) return {}
       return user
     },
     async applyPolicy(policy, parent, args, context) {
-      return policy.requires.includes(context.auth?.role)
+      const isAuth = policy.requires.includes(context.auth?.role)
+      if (!isAuth) {
+        throw new ErrorWithProps(
+          `Failed auth policy`,
+          {
+            code: 'AUTH_FAILED',
+            message: `Failed auth policy`
+          },
+          401
+        )
+      }
+
+      return isAuth
     },
     mode: 'external',
     policy: {
