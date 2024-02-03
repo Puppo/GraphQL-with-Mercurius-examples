@@ -7,7 +7,6 @@ const resolvers = {
     signIn: async (_root, args, context) => {
       const { name, password } = args
       if (password !== 'password') {
-        context.reply.code(401)
         throw new ErrorWithProps(
           'Invalid username or password',
           {
@@ -20,7 +19,6 @@ const resolvers = {
       const user = await context.app.db.get<User>('SELECT * FROM users WHERE name = ?', [name])
 
       if (!user) {
-        context.reply.code(401)
         throw new ErrorWithProps(
           'Invalid username or password',
           {
