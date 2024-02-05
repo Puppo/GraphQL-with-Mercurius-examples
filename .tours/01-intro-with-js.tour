@@ -1,0 +1,47 @@
+{
+  "$schema": "https://aka.ms/codetour-schema",
+  "title": "01-Intro-with-JS",
+  "steps": [
+    {
+      "file": "packages/01-simple-js-blog/src/index.js",
+      "description": "Run application with Fastify",
+      "line": 7
+    },
+    {
+      "file": "packages/01-simple-js-blog/src/server.js",
+      "description": "Import plugins (only SQLite for the query)",
+      "line": 9
+    },
+    {
+      "file": "packages/01-simple-js-blog/src/server.js",
+      "description": "Setup Mercurius",
+      "line": 13
+    },
+    {
+      "file": "packages/01-simple-js-blog/src/plugins/db/index.js",
+      "description": "Init and expose DbPlugin",
+      "line": 57
+    },
+    {
+      "file": "packages/01-simple-js-blog/src/graphQL.js",
+      "description": "Schema of the Server",
+      "line": 6
+    },
+    {
+      "file": "packages/01-simple-js-blog/src/graphQL.js",
+      "description": "Resolvers, to make alive the schema 🚀",
+      "line": 40
+    },
+    {
+      "file": "packages/01-simple-js-blog/src/graphQL.js",
+      "description": "Loaders to load collections, avoiding multiple queries",
+      "line": 103
+    },
+    {
+      "file": "packages/01-simple-js-blog/package.json",
+      "description": "Run it 👨‍💻",
+      "line": 9
+    }
+  ],
+  "ref": "main"
+}

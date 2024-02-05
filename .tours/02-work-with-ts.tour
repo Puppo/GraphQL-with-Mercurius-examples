@@ -1,0 +1,62 @@
+{
+  "$schema": "https://aka.ms/codetour-schema",
+  "title": "02-work-with-ts",
+  "steps": [
+    {
+      "file": "packages/02-work-with-typescript/src/index.ts",
+      "description": "Setup server",
+      "line": 5
+    },
+    {
+      "file": "packages/02-work-with-typescript/src/server.ts",
+      "description": "The same for setup the server",
+      "line": 6
+    },
+    {
+      "file": "packages/02-work-with-typescript/src/graphql/index.ts",
+      "description": "Import mercurius",
+      "line": 11
+    },
+    {
+      "file": "packages/02-work-with-typescript/src/graphql/schema.ts",
+      "description": "Create the schema using `gql` to have a beautiful syntax",
+      "line": 3
+    },
+    {
+      "file": "packages/02-work-with-typescript/src/graphql/resolvers.ts",
+      "description": "Creating Queries",
+      "line": 6
+    },
+    {
+      "file": "packages/02-work-with-typescript/src/graphql/resolvers.ts",
+      "description": "Creating Mutations",
+      "line": 28
+    },
+    {
+      "file": "packages/02-work-with-typescript/src/graphql/resolvers.ts",
+      "description": "Some generated types ",
+      "line": 3
+    },
+    {
+      "file": "packages/02-work-with-typescript/src/graphql/loaders.ts",
+      "description": "Creating loaders",
+      "line": 4
+    },
+    {
+      "file": "packages/02-work-with-typescript/src/graphql/index.ts",
+      "description": "`mercurius-codegen` to generate the Ts types",
+      "line": 18
+    },
+    {
+      "file": "packages/02-work-with-typescript/src/graphql/generated.ts",
+      "description": "The generated types",
+      "line": 1
+    },
+    {
+      "file": "packages/02-work-with-typescript/package.json",
+      "description": "Run it 🚀",
+      "line": 8
+    }
+  ],
+  "ref": "main"
+}

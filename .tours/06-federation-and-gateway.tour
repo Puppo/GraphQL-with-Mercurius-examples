@@ -1,0 +1,67 @@
+{
+  "$schema": "https://aka.ms/codetour-schema",
+  "title": "06-federation-and-gateway",
+  "steps": [
+    {
+      "file": "packages/06-federation/src/blog/index.ts",
+      "description": "A server for the blog",
+      "line": 5
+    },
+    {
+      "file": "packages/06-federation/src/blog/graphql/index.ts",
+      "description": "Federation schema",
+      "line": 16
+    },
+    {
+      "file": "packages/06-federation/src/blog/graphql/schema.ts",
+      "description": "An external type from another federated server",
+      "line": 9
+    },
+    {
+      "file": "packages/06-federation/src/blog/graphql/schema.ts",
+      "description": "We can use the External type inside the schema",
+      "line": 18
+    },
+    {
+      "file": "packages/06-federation/src/blog/graphql/index.ts",
+      "description": "The mercurius plugin is always the same",
+      "line": 24
+    },
+    {
+      "file": "packages/06-federation/src/blog/graphql/loaders.ts",
+      "description": "The loader to indicate which users to load",
+      "line": 10
+    },
+    {
+      "file": "packages/06-federation/src/users/index.ts",
+      "description": "The second federated server",
+      "line": 5
+    },
+    {
+      "file": "packages/06-federation/src/users/graphql/index.ts",
+      "description": "Use the `buildFederationSchema`",
+      "line": 15
+    },
+    {
+      "file": "packages/06-federation/src/users/graphql/schema.ts",
+      "description": "The real `User` schema",
+      "line": 4
+    },
+    {
+      "file": "packages/06-federation/src/users/graphql/loaders.ts",
+      "description": "`__resolveReference` is used to load the users when they are needed",
+      "line": 7
+    },
+    {
+      "file": "packages/06-federation/src/gateway/server.ts",
+      "description": "The gateway server to merge all the federated servers",
+      "line": 5
+    },
+    {
+      "file": "packages/06-federation/package.json",
+      "description": "Run the code 🚀",
+      "line": 9
+    }
+  ],
+  "ref": "main"
+}

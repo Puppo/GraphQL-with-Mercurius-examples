@@ -1,0 +1,17 @@
+{
+  "$schema": "https://aka.ms/codetour-schema",
+  "title": "03-n+1-problem",
+  "steps": [
+    {
+      "file": "packages/03-n+1/src/graphql/resolvers.ts",
+      "description": "Load collection using resolvers",
+      "line": 71
+    },
+    {
+      "file": "packages/03-n+1/src/graphql/index.ts",
+      "description": "What happens using loader?",
+      "line": 14
+    }
+  ],
+  "ref": "main"
+}

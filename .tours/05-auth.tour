@@ -1,0 +1,37 @@
+{
+  "$schema": "https://aka.ms/codetour-schema",
+  "title": "05-auth",
+  "steps": [
+    {
+      "file": "packages/05-auth/src/graphql/index.ts",
+      "description": "A plugin to register the auth strategy",
+      "line": 33
+    },
+    {
+      "file": "packages/05-auth/src/graphql/auth.ts",
+      "description": "Implementa the auth strategy with `mercuriusAuth`",
+      "line": 28
+    },
+    {
+      "file": "packages/05-auth/src/graphql/auth.ts",
+      "description": "the context",
+      "line": 29
+    },
+    {
+      "file": "packages/05-auth/src/graphql/auth.ts",
+      "description": "Check the policy",
+      "line": 40
+    },
+    {
+      "file": "packages/05-auth/src/graphql/auth.ts",
+      "description": "Setup the policy",
+      "line": 56
+    },
+    {
+      "file": "packages/05-auth/package.json",
+      "description": "Run the code 🚀",
+      "line": 9
+    }
+  ],
+  "ref": "main"
+}

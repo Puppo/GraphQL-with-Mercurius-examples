@@ -1,0 +1,47 @@
+{
+  "$schema": "https://aka.ms/codetour-schema",
+  "title": "04-custom-directive",
+  "steps": [
+    {
+      "file": "packages/04-custom-directives-and-validation/src/graphql/schema.ts",
+      "description": "Directives in the schema",
+      "line": 5
+    },
+    {
+      "file": "packages/04-custom-directives-and-validation/src/graphql/schema.ts",
+      "description": "How to use them",
+      "line": 11
+    },
+    {
+      "file": "packages/04-custom-directives-and-validation/src/graphql/index.ts",
+      "description": "What happened in the Schema?",
+      "line": 14
+    },
+    {
+      "file": "packages/04-custom-directives-and-validation/src/graphql/index.ts",
+      "description": "Merge schema with other \"schemas\"",
+      "line": 21
+    },
+    {
+      "file": "packages/04-custom-directives-and-validation/src/graphql/customDirectives/index.ts",
+      "description": "List of directives 💡",
+      "line": 4
+    },
+    {
+      "file": "packages/04-custom-directives-and-validation/src/graphql/customDirectives/upper.ts",
+      "description": "Build a custom directive",
+      "line": 4
+    },
+    {
+      "file": "packages/04-custom-directives-and-validation/src/graphql/index.ts",
+      "description": "Add validation",
+      "line": 31
+    },
+    {
+      "file": "packages/04-custom-directives-and-validation/package.json",
+      "description": "Run the code 🚀",
+      "line": 10
+    }
+  ],
+  "ref": "main"
+}
