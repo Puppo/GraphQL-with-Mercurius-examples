@@ -19,7 +19,7 @@
     "graphql": "^16.8.1",
     "mercurius": "^13.3.3",
     "mercurius-auth": "^5.0.0",
-    "mercurius-codegen": "^5.0.3",
+    "mercurius-codegen": "^5.0.4",
     "mercurius-validation": "^4.0.0",
     "promised-sqlite3": "^2.1.0",
     "sqlite3": "^5.1.7"
