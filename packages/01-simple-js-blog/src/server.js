@@ -3,7 +3,7 @@
 import autoLoad from '@fastify/autoload'
 import { join } from 'desm'
 import mercurius from 'mercurius'
-import { loaders, resolvers, schema } from './graphQL.js'
+import { resolvers, schema } from './graphQL.js'
 
 export async function buildServer(app) {
   app.register(autoLoad, {
@@ -13,7 +13,6 @@ export async function buildServer(app) {
   app.register(mercurius, {
     schema,
     resolvers,
-    loaders,
     graphiql: true
   })
 }

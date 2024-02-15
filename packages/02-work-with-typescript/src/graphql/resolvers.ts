@@ -67,7 +67,31 @@ const Mutation = {
 
 const resolvers: IResolvers = {
   Query,
-  Mutation
+  Mutation,
+  Category: {
+    posts: (category, _, { app: { db } }) =>
+      db.all(
+        `
+      SELECT post.id, post.title, post.content
+      FROM post
+      WHERE post.categoryId = ?
+      ORDER BY post.categoryId
+      `,
+        [category.id]
+      )
+  },
+  Post: {
+    category: (post, _, { app: { db } }) =>
+      db.get(
+        `
+      SELECT category.id, category.name
+      FROM category
+      INNER JOIN post ON post.categoryId = category.id
+      WHERE post.id = ?
+      `,
+        [post.id]
+      )
+  }
 }
 
 export default resolvers

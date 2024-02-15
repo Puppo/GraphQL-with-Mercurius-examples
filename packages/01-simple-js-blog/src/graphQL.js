@@ -97,30 +97,29 @@ export const resolvers = {
       ])
       return post
     }
-  }
-}
-
-export const loaders = {
+  },
   Category: {
-    posts: async (queries, { app: { db } }) => {
-      const postsByCategory = await db.all(`
-SELECT post.categoryId as category_id, post.id, post.title, post.content
-FROM post
-WHERE post.categoryId IN (${queries.map(({ obj: { id } }) => `'${id}'`).join(',')})
-ORDER BY post.categoryId
-`)
-      return queries.map(({ obj: { id } }) => postsByCategory.filter(({ category_id }) => category_id === id))
-    }
+    posts: (category, _, { app: { db } }) =>
+      db.all(
+        `
+      SELECT post.id, post.title, post.content
+      FROM post
+      WHERE post.categoryId = ?
+      ORDER BY post.categoryId
+      `,
+        [category.id]
+      )
   },
   Post: {
-    category: async (queries, { app: { db } }) => {
-      const categoriesByPostId = await db.all(`
-SELECT post.id as post_id, category.id, category.name
-FROM category
-INNER JOIN post ON post.categoryId = category.id
-WHERE post.id IN (${queries.map(({ obj: { id } }) => `'${id}'`).join(',')})
-`)
-      return queries.map(({ obj: { id } }) => categoriesByPostId.find(({ post_id }) => post_id === id))
-    }
+    category: (post, _, { app: { db } }) =>
+      db.get(
+        `
+      SELECT category.id, category.name
+      FROM category
+      INNER JOIN post ON post.categoryId = category.id
+      WHERE post.id = ?
+      `,
+        [post.id]
+      )
   }
 }
