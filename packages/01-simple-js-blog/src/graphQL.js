@@ -106,9 +106,8 @@ export const loaders = {
       const postsByCategory = await db.all(`
 SELECT post.categoryId as category_id, post.id, post.title, post.content
 FROM post
-INNER JOIN category ON category.id = post.categoryId
-WHERE category.id IN (${queries.map(({ obj: { id } }) => `'${id}'`).join(',')})
-ORDER BY category.id
+WHERE post.categoryId IN (${queries.map(({ obj: { id } }) => `'${id}'`).join(',')})
+ORDER BY post.categoryId
 `)
       return queries.map(({ obj: { id } }) => postsByCategory.filter(({ category_id }) => category_id === id))
     }
