@@ -1,5 +1,6 @@
+import { IResolvers } from '@graphql-tools/utils'
 import { randomUUID } from 'crypto'
-import { ErrorWithProps, IResolvers } from 'mercurius'
+import { ErrorWithProps, MercuriusContext } from 'mercurius'
 import { Category } from './generated'
 import type { Mutation, Query } from './utils'
 
@@ -74,7 +75,7 @@ const Mutation = {
   }
 } satisfies Mutation
 
-const resolvers: IResolvers = {
+const resolvers: IResolvers<unknown, MercuriusContext> = {
   Query,
   Mutation
 }
