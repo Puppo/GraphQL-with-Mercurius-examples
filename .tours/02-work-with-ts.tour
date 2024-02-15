@@ -38,9 +38,9 @@
       "line": 3
     },
     {
-      "file": "packages/02-work-with-typescript/src/graphql/loaders.ts",
-      "description": "Creating loaders",
-      "line": 4
+      "file": "packages/02-work-with-typescript/src/graphql/resolvers.ts",
+      "description": "Creating type resolvers",
+      "line": 71
     },
     {
       "file": "packages/02-work-with-typescript/src/graphql/index.ts",

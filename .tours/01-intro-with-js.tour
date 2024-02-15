@@ -34,8 +34,8 @@
     },
     {
       "file": "packages/01-simple-js-blog/src/graphQL.js",
-      "description": "Loaders to load collections, avoiding multiple queries",
-      "line": 103
+      "description": "Type resolver to load collections",
+      "line": 102
     },
     {
       "file": "packages/01-simple-js-blog/package.json",
